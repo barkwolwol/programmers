@@ -1,0 +1,47 @@
+-- **SUM, MAX, MIN**
+
+
+-- 가장 비싼 상품 구하기
+SELECT MAX(PRICE) AS "MAX_PRICE"
+FROM PRODUCT;
+
+
+-- 최댓값 구하기
+SELECT MAX(DATETIME) AS "시간"
+FROM ANIMAL_INS;
+
+
+-- 최솟값 구하기
+SELECT MIN(DATETIME) AS "시간"
+FROM ANIMAL_INS;
+
+
+-- 가격이 제일 비싼 식품의 정보 출력하기
+SELECT *
+FROM FOOD_PRODUCT
+WHERE PRICE = (SELECT MAX(PRICE)
+              FROM FOOD_PRODUCT);
+
+
+-- 가격이 제일 비싼 식품의 정보 출력하기
+SELECT *
+FROM (SELECT *
+     FROM FOOD_PRODUCT
+     ORDER BY PRICE DESC)
+WHERE ROWNUM = 1;
+
+
+-- 동물 수 구하기
+SELECT COUNT(*) AS "count"
+FROM ANIMAL_INS
+
+
+-- 중복 제거하기
+SELECT COUNT(DISTINCT NAME) AS "count"
+FROM ANIMAL_INS
+WHERE NAME IS NOT NULL;
+
+
+-- 중복 제거하기
+SELECT COUNT(DISTINCT (NAME)) AS "count"
+FROM ANIMAL_INS;
