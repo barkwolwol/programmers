@@ -179,3 +179,71 @@ AND START_DATE BETWEEN TO_DATE('2022-08-01', 'YYYY-MM-DD') AND TO_DATE('2022-10-
 GROUP BY EXTRACT(MONTH FROM START_DATE), CAR_ID
 HAVING COUNT(*) > 0
 ORDER BY 1, 2 DESC;
+
+
+-- 저자 별 카테고리 별 매출액 집계하기 (LEVEL 4)
+SELECT A.AUTHOR_ID, AUTHOR_NAME, CATEGORY, SUM(SALES * PRICE) AS TOTAL_SALES
+FROM BOOK B, BOOK_SALES S, AUTHOR A
+WHERE B.BOOK_ID = S.BOOK_ID
+AND A.AUTHOR_ID = B.AUTHOR_ID
+AND SALES_DATE BETWEEN TO_DATE('2022-01-01', 'YYYY-MM-DD') AND TO_DATE('2022-01-31', 'YYYY-MM-DD')
+GROUP BY A.AUTHOR_ID, A.AUTHOR_NAME, CATEGORY
+ORDER BY 1, 3 DESC;
+
+-- 저자 별 카테고리 별 매출액 집계하기 (LEVEL 4)
+SELECT AUTHOR_ID, AUTHOR_NAME, CATEGORY, SUM(SALES * PRICE) AS TOTAL_SALES
+FROM (SELECT *
+       FROM BOOK_SALES A
+       NATURAL JOIN BOOK B
+       WHERE TO_CHAR(SALES_DATE, 'MM') = '01')
+INNER JOIN AUTHOR
+USING (AUTHOR_ID)
+GROUP BY AUTHOR_ID, AUTHOR_NAME, CATEGORY
+ORDER BY AUTHOR_ID ASC, CATEGORY DESC;
+
+
+-- SELECT A.AUTHOR_ID, AUTHOR_NAME, CATEGORY, SUM(SALES) * PRICE AS TOTAL_SALES
+-- FROM BOOK B, BOOK_SALES S, AUTHOR A
+-- WHERE B.BOOK_ID = S.BOOK_ID
+-- AND A.AUTHOR_ID = B.AUTHOR_ID
+-- AND SALES_DATE BETWEEN TO_DATE('2022-01-01', 'YYYY-MM-DD') AND TO_DATE('2022-01-31', 'YYYY-MM-DD')
+-- GROUP BY A.AUTHOR_ID, A.AUTHOR_NAME, CATEGORY, PRICE
+-- ORDER BY 1, 3 DESC;
+
+-- 두 쿼리 간에 주된 차이는 SUM(SALES * PRICE)와 SUM(SALES) * PRICE 부분에 있습니다.
+
+-- 첫 번째 쿼리 (SUM(SALES * PRICE)):
+-- 이 쿼리는 각 판매 건에 대한 가격을 곱한 후에 합산합니다. 즉, 판매 수량과 가격을 각각 계산한 후에 더합니다.
+
+-- 두 번째 쿼리 (SUM(SALES) * PRICE):
+-- 이 쿼리는 판매 수량의 합을 먼저 계산하고, 그 후에 가격을 곱합니다. 즉, 가격을 한 번만 곱합니다.
+
+-- 이로 인해 결과에 차이가 발생할 수 있습니다. 만약 한 권의 책이 여러 번 팔렸다면, 두 번째 쿼리에서는 판매 수량의 합을 구한 후에 가격을 곱하기 때문에 총 매출이 더 높게 나타날 것입니다.
+
+-- 예를 들어, 가정해보겠습니다:
+
+-- 책 A의 가격이 20이고, 2번 팔렸다고 가정합니다.
+-- 책 B의 가격이 30이고, 3번 팔렸다고 가정합니다.
+-- 첫 번째 쿼리 결과:
+
+-- 책 A: (2 * 20) = 40
+-- 책 B: (3 * 30) = 90
+-- 두 번째 쿼리 결과:
+
+-- 책 A: (2 + 2) * 20 = 80
+-- 책 B: (3 + 3) * 30 = 180
+-- 따라서 같은 기간 동안 같은 판매 내역이라도 두 쿼리의 결과는 다를 수 있습니다.
+
+
+-- 두 번째 쿼리에서 결과가 중복으로 나오는 이유는 GROUP BY 절에 PRICE가 추가되었기 때문입니다. 두 번째 쿼리의 GROUP BY 절은 다음과 같습니다:
+
+-- sql
+-- Copy code
+-- GROUP BY A.AUTHOR_ID, A.AUTHOR_NAME, CATEGORY, PRICE
+-- 이렇게 되면 같은 저자, 같은 카테고리, 같은 가격인 항목들은 서로 다른 행으로 취급됩니다. 즉, 동일한 판매 건이라도 가격이 다르면 각각 별도의 행으로 나타나게 됩니다.
+
+-- 예를 들어, 두 번째 쿼리 결과에서 "홍길동"의 "경제" 카테고리는 두 번 중복되어 나타납니다. 이는 같은 카테고리이지만 가격이 다르기 때문입니다. 따라서 중복된 결과가 나타나게 됩니다.
+
+-- 첫 번째 쿼리에서는 GROUP BY에 PRICE가 없으므로 같은 저자, 같은 카테고리인 항목들은 모두 하나의 행으로 표시됩니다.
+
+
