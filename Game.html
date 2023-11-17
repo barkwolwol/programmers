@@ -47,6 +47,10 @@
     const square = document.getElementById('square');
     let posX = 0;
     let posY = 0;
+    let playerSpeedX = 0;
+    let playerSpeedY = 0;
+    const acceleration = 0.5;
+    const friction = 0.9;
     const step = 20;
     let isGameOver = false;
     let score = 0;
@@ -54,25 +58,13 @@
     let bulletPosY;
     let isBulletFired = false;
     const bulletSpeed = 10;
-    const largeObstacleHitsRequired = 8; // 보라색 장애물 제거에 필요한 총알 명중 횟수
+    const largeObstacleHitsRequired = 8;
 
-    function moveSquare(direction) {
+    function moveSquare() {
       if (isGameOver) return;
 
-      switch (direction) {
-        case 'ArrowUp':
-          posY -= step;
-          break;
-        case 'ArrowDown':
-          posY += step;
-          break;
-        case 'ArrowLeft':
-          posX -= step;
-          break;
-        case 'ArrowRight':
-          posX += step;
-          break;
-      }
+      posX += playerSpeedX;
+      posY += playerSpeedY;
 
       if (posX < 0 || posX + 50 > window.innerWidth || posY < 0 || posY + 50 > window.innerHeight) {
         isGameOver = true;
@@ -90,16 +82,16 @@
       if (isGameOver) return;
 
       const obstacle = document.createElement('div');
-      const isLargeObstacle = Math.random() < 0.1; // 10% 확률로 대형 장애물 생성
+      const isLargeObstacle = Math.random() < 0.1;
       obstacle.className = isLargeObstacle ? 'obstacle large' : 'obstacle';
       
       obstacle.style.top = Math.floor(Math.random() * window.innerHeight) + 'px';
       obstacle.style.left = window.innerWidth + 'px';
-      obstacle.moveX = -Math.floor(Math.random() * 5) - 2; // 장애물 속도 (2에서 6까지의 난수)
+      obstacle.moveX = -Math.floor(Math.random() * 5) - 2;
 
       document.body.appendChild(obstacle);
 
-      setTimeout(createObstacle, 600); // 장애물 생성 간격을 600ms로 줄임
+      setTimeout(createObstacle, 600);
     }
 
     function checkCollision() {
@@ -125,12 +117,34 @@
     document.addEventListener('keydown', (event) => {
       const key = event.key;
       if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
-        moveSquare(key);
+        applyAcceleration(key);
       }
       if (key === 'Control' && !isBulletFired) {
         fireBullet();
       }
     });
+
+    document.addEventListener('keyup', () => {
+      playerSpeedX *= friction;
+      playerSpeedY *= friction;
+    });
+
+    function applyAcceleration(direction) {
+      switch (direction) {
+        case 'ArrowUp':
+          playerSpeedY -= acceleration;
+          break;
+        case 'ArrowDown':
+          playerSpeedY += acceleration;
+          break;
+        case 'ArrowLeft':
+          playerSpeedX -= acceleration;
+          break;
+        case 'ArrowRight':
+          playerSpeedX += acceleration;
+          break;
+      }
+    }
 
     function fireBullet() {
       if (isGameOver) return;
@@ -212,17 +226,15 @@
           bulletRect.bottom > obstacleRect.top
         ) {
           if (obstacle.classList.contains('large')) {
-            // 대형 장애물인 경우
             obstacle.hits = obstacle.hits || 0;
             obstacle.hits += 1;
 
             if (obstacle.hits >= largeObstacleHitsRequired) {
               obstacle.remove();
-              score += 8; // 보라색 장애물을 파괴하면 8점 획득
+              score += 8;
               document.getElementById('score').textContent = '파괴 : ' + score;
             }
           } else {
-            // 일반 장애물인 경우
             obstacle.remove();
             score += 1;
             document.getElementById('score').textContent = '파괴 : ' + score;
@@ -238,6 +250,7 @@
     createObstacle();
     moveObstacles();
     moveBullets();
+    setInterval(moveSquare, 1000 / 60); // 60fps로 설정
   </script>
 </body>
 </html>

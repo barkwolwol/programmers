@@ -7,8 +7,8 @@
     <style>
         #game-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 1000px;
+            height: 800px;
             border: 1px solid #000;
             overflow: hidden;
         }
@@ -54,8 +54,8 @@
                 playerSpeedY = Math.max(-maxSpeed, Math.min(maxSpeed, playerSpeedY));
 
                 // 플레이어가 화면을 벗어나지 않도록 제한
-                playerX = Math.max(0, Math.min(350, playerX));
-                playerY = Math.max(0, Math.min(350, playerY));
+                playerX = Math.max(0, Math.min(950, playerX));
+                playerY = Math.max(0, Math.min(750, playerY));
 
                 // 플레이어의 스타일을 업데이트
                 player.style.left = playerX + 'px';
