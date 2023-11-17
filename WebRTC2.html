@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC 실시간 채팅</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chat-box {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #chat-history {
+            height: 200px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #chat-input {
+            display: flex;
+        }
+
+        #nickname-input {
+            flex: 1;
+            margin-right: 5px;
+            width: 80px;
+        }
+
+        #message-input {
+            flex: 2;
+            margin-right: 5px;
+        }
+
+        #send-button {
+            flex: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-box">
+        <div id="chat-history"></div>
+        <div id="chat-input">
+            <input type="text" id="nickname-input" placeholder="닉네임">
+            <input type="text" id="message-input" placeholder="메시지 입력">
+            <button id="send-button">전송</button>
+        </div>
+    </div>
+
+    <script>
+        const chatHistory = document.getElementById('chat-history');
+        const nicknameInput = document.getElementById('nickname-input');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Enter 키를 눌렀을 때 메시지 전송
+        messageInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const message = messageInput.value;
+            const nickname = nicknameInput.value;
+
+            if (message && nickname) {
+                displayMessage(nickname, message);
+                // 다른 창에도 메시지를 전달하기 위해 localStorage를 사용
+                localStorage.setItem('chatMessage', JSON.stringify({ nickname, message }));
+                messageInput.value = '';
+            }
+        }
+
+        function displayMessage(nickname, message) {
+            chatHistory.innerHTML += `<div><strong>${nickname}:</strong> ${message}</div>`;
+        }
+
+        // 다른 창에서 전송한 메시지를 수신하여 표시
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'chatMessage') {
+                const { nickname, message } = JSON.parse(event.newValue);
+                displayMessage(nickname, message);
+            }
+        });
+    </script>
+</body>
+</html>
