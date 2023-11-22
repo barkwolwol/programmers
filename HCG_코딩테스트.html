@@ -24,12 +24,19 @@
     //   alert(phoneNumber); // 가려진 전화번호를 알림창에 표시
     // }
 
-    function callPhone() {
-      var phoneNumber = $("#inPhone").val(); // input 요소에서 전화번호 가져오기
-      phoneNumber = phoneNumber.replace(/(\d{3}-)\d{4}-(\d{4})/, "$1****-$2"); // 가운데 4자리를 *로 대체
-      alert(phoneNumber); // 가려진 전화번호를 알림창에 표시
-    }
+    // function callPhone() {
+    //   var phoneNumber = $("#inPhone").val(); // input 요소에서 전화번호 가져오기
+    //   phoneNumber = phoneNumber.replace(/(\d{3}-)\d{4}-(\d{4})/, "$1****-$2"); // 가운데 4자리를 *로 대체
+    //   alert(phoneNumber); // 가려진 전화번호를 알림창에 표시
+    // }
 
+    function callPhone() {
+      let phoneNumber = $('#inPhone').val();
+      phoneNumber = phoneNumber.replace(/-/g, '');
+      let maskedPhoneNumber = phoneNumber.substring(0, 3) + "-****-" + phoneNumber.substring(7);
+      alert(maskedPhoneNumber);
+      console.log(maskedPhoneNumber);
+    }
   </script>
 
 </head>
