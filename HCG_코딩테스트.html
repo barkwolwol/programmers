@@ -30,12 +30,19 @@
     //   alert(phoneNumber); // 가려진 전화번호를 알림창에 표시
     // }
 
+    // function callPhone() {
+    //   let phoneNumber = $("#inPhone").val();
+    //   phoneNumber = phoneNumber.replace(/-/g, '');
+    //   let maskedPhoneNumber = phoneNumber.substring(0, 3) + "-****-" + phoneNumber.substring(7);
+    //   alert(maskedPhoneNumber);
+    //   console.log(maskedPhoneNumber);
+    // }
+
     function callPhone() {
-      let phoneNumber = $('#inPhone').val();
-      phoneNumber = phoneNumber.replace(/-/g, '');
-      let maskedPhoneNumber = phoneNumber.substring(0, 3) + "-****-" + phoneNumber.substring(7);
-      alert(maskedPhoneNumber);
-      console.log(maskedPhoneNumber);
+      let phoneNumber = $("#inPhone").val();
+      phoneNumber = phoneNumber.replace(/(\d{3}-)\d{4}-(\d{4})/, "$1****-$2");
+      alert(phoneNumber);
+      console.log(phoneNumber);
     }
   </script>
 
