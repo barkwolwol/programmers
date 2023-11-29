@@ -110,3 +110,37 @@ WHERE CAR_TYPE = '세단' AND TO_CHAR(START_DATE, 'MM') = '10'
 ORDER BY 1 DESC;
 
 
+-- 조건에 맞는 사용자 정보 조회하기 (LEVEL 3)
+SELECT USER_ID,
+       NICKNAME,
+       CITY || ' ' || STREET_ADDRESS1 || ' ' || STREET_ADDRESS2 AS 전체주소,
+       SUBSTR(TLNO, 1, 3) || '-' || SUBSTR(TLNO, 4, 4) || '-' || SUBSTR(TLNO, 8, 4) AS 전화번호
+  FROM USED_GOODS_USER
+  JOIN (SELECT WRITER_ID, COUNT(WRITER_ID)
+          FROM USED_GOODS_BOARD
+         GROUP BY WRITER_ID
+        HAVING COUNT(WRITER_ID) > 2)
+    ON (USER_ID = WRITER_ID)
+ ORDER BY 1 DESC;
+
+SELECT USER_ID,
+       NICKNAME,
+       CITY || ' ' || STREET_ADDRESS1 || ' ' || STREET_ADDRESS2 AS 전체주소,
+       SUBSTR(TLNO, 1, 3) || '-' || SUBSTR(TLNO, 4, 4) || '-' || SUBSTR(TLNO, 8, 4) AS 전화번호
+  FROM USED_GOODS_USER
+ WHERE USER_ID IN (SELECT WRITER_ID
+                     FROM USED_GOODS_BOARD
+                    GROUP BY WRITER_ID
+                   HAVING COUNT(WRITER_ID) > 2)
+ ORDER BY 1 DESC;
+
+SELECT USER_ID,
+       NICKNAME,
+       CITY || ' ' || STREET_ADDRESS1 || ' ' || STREET_ADDRESS2 AS 전체주소,
+       REGEXP_REPLACE(TLNO, '(.{3})(.+)(.{4})','\1-\2-\3') AS 전화번호
+  FROM USED_GOODS_USER
+ WHERE USER_ID IN (SELECT WRITER_ID
+                     FROM USED_GOODS_BOARD
+                    GROUP BY WRITER_ID
+                   HAVING COUNT(WRITER_ID) > 2)
+ ORDER BY 1 DESC;
