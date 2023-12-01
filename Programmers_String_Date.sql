@@ -144,3 +144,27 @@ SELECT USER_ID,
                     GROUP BY WRITER_ID
                    HAVING COUNT(WRITER_ID) > 2)
  ORDER BY 1 DESC;
+
+
+ -- 조회수가 가장 많은 중고거래 게시판의 첨부파일 조회하기 (LEVEL 3)
+SELECT '/home/grep/src/' || BOARD_ID || '/' || FILE_ID || FILE_NAME || FILE_EXT AS FILE_PATH
+  FROM USED_GOODS_FILE
+ WHERE BOARD_ID IN (SELECT BOARD_ID
+                      FROM USED_GOODS_BOARD
+                     WHERE VIEWS = (SELECT MAX(VIEWS)
+                                      FROM USED_GOODS_BOARD))
+ ORDER BY FILE_ID DESC;
+
+
+-- 조건별로 분류하여 주문상태 출력하기 (LEVEL 3)
+SELECT ORDER_ID,
+       PRODUCT_ID,
+       TO_CHAR(OUT_DATE, 'YYYY-MM-DD') AS OUT_DATE,
+  CASE WHEN TO_CHAR(OUT_DATE, 'YYYY-MM-DD') <= '2022-05-01' THEN '출고완료'
+       WHEN TO_CHAR(OUT_DATE, 'YYYY-MM-DD') > '2022-05-01' THEN '출고대기'
+       ELSE '출고미정' 
+   END AS 출고여부
+  FROM FOOD_ORDER
+ ORDER BY 1;
+
+
